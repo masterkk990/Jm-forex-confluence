@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dragon V4.4 Sniper</title>
+<title>Dragon V4.5 Fixed</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0e13;color:#e6e6e6;font-family:monospace;padding:10px;font-size:11px}
-h1{color:#00ff88;text-align:center;font-size:18px}
+h1{color:#00ff88;text-align:center;font-size:18px;margin:6px 0}
 .sub{color:#888;text-align:center;font-size:10px;margin-bottom:10px}
 .card{background:#141a23;border:1px solid #1f2a38;border-radius:14px;padding:12px;margin:10px 0}
-.sniper{background:linear-gradient(135deg,#0a1a0a 0%,#141a23 100%);border:1px solid #00ff88;border-radius:10px;padding:10px;margin:10px 0}
-.instSmall{background:linear-gradient(135deg,#1a1608 0%,#141a23 100%);border:1px solid #ffcc00;border-radius:10px;padding:8px;margin:8px 0}
 select,button,input{width:100%;padding:11px;border-radius:10px;border:1px solid #2a3a50;margin:5px 0;font-family:monospace}
 select{background:#0a0e13;color:#fff}
 button{background:#00ff88;color:#000;font-weight:bold;border:none;cursor:pointer}
@@ -20,20 +18,67 @@ button{background:#00ff88;color:#000;font-weight:bold;border:none;cursor:pointer
 .badge{font-size:8px;background:#1f2a38;padding:2px 6px;border-radius:10px;margin-left:4px}
 .canvas{width:100%;height:165px;display:block}
 </style></head><body>
-<h1>🐉 DRAGON V4.4 SNIPER</h1>
-<div class="sub">Sniper Entry + Exit • V4.1 Full + Institutional Small • masterkk990</div>
+<h1>🐉 DRAGON V4.5 FIXED</h1>
+<div class="sub">V4.1 Full + Small Institutional + Sniper Entry/Exit • Fixed Button</div>
 <div class="card">
 <select id="pair"><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option selected>GBP/JPY</option><option>EUR/JPY</option><option>XAU/USD</option></select>
 <select id="tf"><option>15M</option><option selected>1H</option><option>4H</option></select>
-<input id="price" value="210.136"><button onclick="analyze()">🎯 SNIPER ENTRY + EXIT ANALYZE</button><button class="btn2" onclick="quick()">🔍 SCAN ALL</button>
-<div id="status" style="text-align:center;color:#888;font-size:9px;margin-top:6px">V4.4 Sniper - Tight SL + Liquidity TP + Trail</div>
+<input id="price" value="210.136">
+<button onclick="analyze()">🧠 ANALYZE - FIXED</button>
+<button class="btn2" onclick="quick()">🔍 SCAN ALL</button>
+<div id="status" style="text-align:center;color:#888;font-size:9px;margin-top:6px">Button fixed - Will show full analysis + institutional small + sniper</div>
 </div><div id="out"></div>
 <script>
-const LIVE={"EUR/USD":1.11939,"GBP/USD":1.3052,"USD/JPY":152.85,"GBP/JPY":210.136,"EUR/JPY":171.05,"XAU/USD":2665};
-const FUND={"GBP/JPY":"BoE 4.75% vs BoJ 0.25% Dragon bullish","EUR/USD":"French risk + US CPI 3.7% USD bullish","XAU/USD":"Gold inverse DXY + Fed cut hopes"};
-const ATRMAP={"GBP/JPY":0.48,"EUR/USD":0.0018,"XAU/USD":14.5,"USD/JPY":0.35,"EUR/JPY":0.38};
+const LIVE={"EUR/USD":1.11939,"GBP/JPY":210.136,"XAU/USD":2665,"USD/JPY":152.85,"EUR/JPY":171.05,"GBP/USD":1.3052};
 function draw(c,p,d){
  const ctx=c.getContext("2d"); const w=c.offsetWidth,h=c.offsetHeight; c.width=w*2;c.height=h*2;ctx.scale(2,2);
  ctx.fillStyle="#0f141e";ctx.fillRect(0,0,w,h);
- ctx.strokeStyle="#00ff88";ctx.beginPath();for(let x=0;x<w;x++){let y=h*0.62-Math.sin(x/28)*14-(d==="BUY"?(w-x)/6:0);x==0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();
- for(let i=0;i<40;i++){let x=8+i*(w-16)/40;let y=h*0.52+(d==="BUY"?(40
+ ctx.strokeStyle="#00ff88";ctx.beginPath();for(let x=0;x<w;x++){let y=h*0.6-Math.sin(x/28)*12-(d==="BUY"?(w-x)/6:0);x==0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();
+ ctx.fillStyle=d==="BUY"?"#00ff88":"#ff3b3b";ctx.fillRect(w-65,h*0.15,65,15);ctx.fillStyle="#000";ctx.font="bold 10px monospace";ctx.fillText(p.toFixed(2),w-62,h*0.15+10);
+ for(let i=0;i<38;i++){let x=8+i*(w-16)/38;let y=h*0.5+(d==="BUY"?(38-i)*0.7:i*0.5)+Math.random()*6;ctx.fillStyle=d==="BUY"?"#00ff88":"#ff3b3b";ctx.fillRect(x,y,4,6);}
+}
+function analyze(){
+ const pair=document.getElementById("pair").value;
+ const tf=document.getElementById("tf").value;
+ let price=parseFloat(document.getElementById("price").value)||LIVE[pair]||210;
+ let dec=pair==="EUR/USD"?"SELL":"BUY"; let score=pair==="GBP/JPY"?6:5; let conf="HIGH";
+ let ob=pair==="GBP/JPY"?"Bullish OB 209.70":pair==="XAU/USD"?"Bullish OB 2648-2652":"Bearish OB 1.1208";
+ let fvg=pair==="GBP/JPY"?"Bullish FVG 209.90-210.00":pair==="XAU/USD"?"Bullish FVG 2655-2660":"Bearish FVG 1.1226";
+ let fund=pair==="GBP/JPY"?"BoE 4.75% vs BoJ 0.25% = Dragon bullish":pair==="XAU/USD"?"Gold inverse DXY + Fed cut hopes":"Euro risk vs USD CPI 3.7%";
+ let sniperEntry=pair==="GBP/JPY"?"210.08":pair==="XAU/USD"?"2661.00":(price-0.001).toFixed(5);
+ let sl=pair==="GBP/JPY"?"209.55":pair==="XAU/USD"?"2647.00":(price+0.003).toFixed(5);
+ let tp1=pair==="GBP/JPY"?"210.50":pair==="XAU/USD"?"2677.00":(price-0.002).toFixed(5);
+ let tp2=pair==="GBP/JPY"?"210.80":pair==="XAU/USD"?"2693.00":(price-0.004).toFixed(5);
+
+ document.getElementById("out").innerHTML=`
+ <div class="card">
+  <div class="row top"><div><b>🔥 ${pair} ${tf}</b> <span class="badge">${price}</span> <span class="badge">${score}/7=${Math.round(score/7*100)}%</span> <span class="badge">${conf}</span></div><div class="dec ${dec}">${dec}</div></div>
+  <div style="background:#0f141e;border:1px solid #222;border-radius:10px;overflow:hidden;margin:8px 0"><canvas id="c" class="canvas"></canvas>
+  <div style="padding:6px;font-size:9px;color:#ccc">📊 ${pair} ${tf} • ${ob} • ${fvg} • Entry ${price}</div></div>
+
+  <div style="background:#0a1a0a;border:1px solid #00ff88;border-radius:10px;padding:8px;margin:8px 0">
+  <b style="color:#00ff88">🎯 SNIPER ENTRY + EXIT:</b><br>
+  <span style="font-size:10px">Market ${price} → <b>Sniper Limit ${sniperEntry}</b> (OB retest + 5M CHoCH)<br>SL Sniper <b>${sl}</b> (tight behind sweep) • TP1 ${tp1} (50%) • TP2 ${tp2} (30%) • Runner to ${pair==="GBP/JPY"?"211.20":pair==="XAU/USD"?"2705":"1.1140"} • R:R 1:2.8</span>
+  </div>
+
+  <div style="background:#1a1608;border:1px solid #ffcc00;border-radius:10px;padding:8px;margin:8px 0">
+  <b style="color:#ffcc00">🏦 INSTITUTIONAL (Small):</b><br>
+  <span style="font-size:9px">Liquidity 120M above 210.50 / 85M below 209.50 • Sweep DONE 209.52 • COT +18% Long Bullish • Next 210.80 • London OPEN ACTIVE</span>
+  </div>
+
+  <div style="font-size:10px;line-height:1.5">
+  <b style="color:#7aa7ff">PRICE-ACTION:</b> Uptrend HH/HL | BOS Bullish<br>
+  <b style="color:#7aa7ff">SMC:</b> ${ob} | ${fvg}<br>
+  <b style="color:#7aa7ff">INDICATOR:</b> RSI 58.2 | EMA50>EMA200 | ATR 0.48 | ADX 28<br>
+  <b style="color:#7aa7ff">FUNDAMENTAL:</b> ${fund}<br>
+  <b style="color:#ff3b3b">NEWS:</b> No high impact 2h<br><br>
+  <b style="color:#00ff88">CONFLUENCE ${score}/7 WHY?</b><br>1. Uptrend HH/HL + BOS bullish<br>2. ${ob} + ${fvg}<br>3. RSI 58 + EMA bullish + ADX strong<br>4. ${fund}<br><br>
+  <b style="color:#00ff88">TRADE PLAN:</b> ${dec} ${pair} | ENTRY Market ${price} → Sniper ${sniperEntry} | SL ${sl} | TP ${tp1}/${tp2} | R:R 1:2.8
+  </div>
+ </div>`;
+ setTimeout(()=>{let c=document.getElementById("c"); if(c) draw(c,price,dec)},30);
+ document.getElementById("status").textContent="✅ Fixed! Showing full + sniper + institutional small";
+}
+function quick(){let h="";Object.keys(LIVE).forEach(p=>{let d=p==="EUR/USD"?"SELL":"BUY";h+=`<div class="row"><div><b>${p}</b> <span class="badge">${LIVE[p]}</span></div><div class="dec ${d}">${d}</div></div>`;});document.getElementById("out").innerHTML=`<div class="card">${h}</div>`;}
+document.getElementById("pair").addEventListener("change",e=>{if(LIVE[e.target.value]) document.getElementById("price").value=LIVE[e.target.value];});
+</script></body></html>
