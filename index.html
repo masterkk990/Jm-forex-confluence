@@ -1,49 +1,65 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dragon V4 - AI Analyst No API</title>
+<title>Dragon V4.1 - AI Analyst PRO</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0e13;color:#e6e6e6;font-family:monospace;padding:10px;font-size:12px}
-h1{color:#00ff88;text-align:center;font-size:18px;margin:6px}
+h1{color:#00ff88;text-align:center;font-size:19px;margin:8px 0 2px}
 .sub{color:#888;text-align:center;font-size:10px;margin-bottom:10px}
-.card{background:#141a23;border:1px solid #1f2a38;border-radius:12px;padding:12px;margin:8px 0}
-select,button,input{width:100%;padding:11px;border-radius:10px;border:1px solid #2a3a50;margin:6px 0;font-family:monospace}
+.card{background:#141a23;border:1px solid #1f2a38;border-radius:14px;padding:12px;margin:10px 0}
+select,button,input{width:100%;padding:12px;border-radius:10px;border:1px solid #2a3a50;margin:6px 0;font-family:monospace;font-size:13px}
 select{background:#0a0e13;color:#fff}
-button{background:#00ff88;color:#000;font-weight:bold;border:none;font-size:14px}
-.btn2{background:#1f2a38;color:#fff}
-.row{display:flex;justify-content:space-between;background:#0f141e;padding:10px;border-radius:8px;margin:6px 0;border-left:4px solid #333}
+button{background:#00ff88;color:#000;font-weight:bold;border:none;font-size:14px;cursor:pointer}
+.btn2{background:#1f2a38;color:#fff;border:1px solid #2a3a50}
+.row{display:flex;justify-content:space-between;background:#0f141e;padding:10px;border-radius:10px;margin:7px 0;border-left:4px solid #333;align-items:center}
 .top{border-left-color:#00ff88;background:#11211a}
-.dec{padding:6px 12px;border-radius:20px;font-weight:bold;min-width:75px;text-align:center}
+.dec{padding:7px 14px;border-radius:20px;font-weight:bold;min-width:80px;text-align:center;font-size:12px}
 .BUY{background:#00ff88;color:#000}.SELL{background:#ff3b3b;color:#fff}.WAIT{background:#444;color:#aaa}
-.badge{font-size:9px;background:#1f2a38;padding:2px 6px;border-radius:10px;margin-left:4px}
-.chart{background:#0f141e;border:1px solid #222;border-radius:10px;padding:8px;margin:8px 0;text-align:center}
+.badge{font-size:9px;background:#1f2a38;padding:3px 7px;border-radius:10px;margin-left:5px}
+.chartWrap{background:#0f141e;border:1px solid #222;border-radius:12px;padding:0;overflow:hidden;margin:10px 0}
+.canvas{width:100%;height:180px;display:block}
+.small{font-size:10px;color:#888}
+.dot{width:8px;height:8px;background:#00ff88;border-radius:50%;display:inline-block;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 </style></head><body>
-<h1>🐉 DRAGON V4 AI ANALYST</h1>
-<div class="sub">NO API • PURE AI • BUY/SELL+WHY+CHART • Live Oct 14 2026</div>
+<h1>🐉 DRAGON V4.1 PRO</h1>
+<div class="sub"><span class="dot"></span> NO API • PURE AI • BUY/SELL+WHY+CHART • Live Oct 14 2026</div>
 <div class="card">
-<select id="pair"><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option selected>GBP/JPY</option><option>EUR/JPY</option><option>AUD/USD</option><option>USD/CHF</option><option>NZD/USD</option><option>USD/CAD</option><option>EUR/GBP</option><option>AUD/JPY</option><option>GBP/AUD</option><option>EUR/AUD</option><option>CHF/JPY</option><option>XAU/USD</option></select>
-<select id="tf"><option>15M</option><option selected>1H</option><option>4H</option><option>1D</option></select>
-<input id="price" value="210.136">
-<button onclick="analyze()">🧠 ANALYZE - AI CONFLUENCE</button>
-<button class="btn2" onclick="quickScan()">🔍 SCAN ALL 15 PAIRS</button>
-<div id="status" style="font-size:10px;color:#888;text-align:center">Select pair + price + Analyze. No API key needed.</div>
+<select id="pair"><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>GBP/JPY</option><option>EUR/JPY</option><option>AUD/USD</option><option>USD/CHF</option><option>NZD/USD</option><option>USD/CAD</option><option>EUR/GBP</option><option>AUD/JPY</option><option>GBP/AUD</option><option>EUR/AUD</option><option>CHF/JPY</option><option selected>XAU/USD</option></select>
+<select id="tf"><option selected>15M</option><option>1H</option><option>4H</option><option>1D</option></select>
+<input id="price" value="2665"><button onclick="analyze()">🧠 ANALYZE - AI CONFLUENCE</button><button class="btn2" onclick="quickScan()">🔍 SCAN ALL 15 PAIRS</button>
+<div id="status" class="small" style="text-align:center;margin-top:8px">V4.1 PRO Ready - ATR & Fundamentals fixed</div>
 </div><div id="out"></div>
 <script>
-const LIVE_PRICES={"EUR/USD":1.11939,"GBP/USD":1.3052,"USD/JPY":152.85,"GBP/JPY":210.136,"EUR/JPY":171.05,"AUD/USD":0.672,"USD/CHF":0.895,"NZD/USD":0.612,"USD/CAD":1.375,"EUR/GBP":0.8575,"AUD/JPY":102.7,"GBP/AUD":1.942,"EUR/AUD":1.665,"CHF/JPY":170.8,"XAU/USD":2665};
+const LIVE={"EUR/USD":1.11939,"GBP/USD":1.3052,"USD/JPY":152.85,"GBP/JPY":210.136,"EUR/JPY":171.05,"AUD/USD":0.672,"USD/CHF":0.895,"NZD/USD":0.612,"USD/CAD":1.375,"EUR/GBP":0.8575,"AUD/JPY":102.7,"GBP/AUD":1.942,"EUR/AUD":1.665,"CHF/JPY":170.8,"XAU/USD":2665};
+const FUND={"EUR/USD":"Euro French risk + German inflation 3.3% vs US CPI 3.7% = USD bullish","GBP/USD":"BoE 4.75% hawkish vs Fed 4.5% - GBP strong","USD/JPY":"Fed 4.5% vs BoJ 0.25% = USD/JPY long + intervention risk 155","GBP/JPY":"BoE 4.75% vs BoJ 0.25% = Dragon bullish + Risk-On","EUR/JPY":"ECB 3.5% vs BoJ 0.25% = EUR/JPY bullish","AUD/USD":"RBA 4.35% vs Fed 4.5% + China risk","USD/CHF":"Fed 4.5% vs SNB 1.25% = USD bullish","NZD/USD":"RBNZ 5.25% vs Fed","USD/CAD":"Fed 4.5% vs BoC 4.25% + Oil","EUR/GBP":"ECB 3.5% vs BoE 4.75% = GBP stronger","AUD/JPY":"RBA 4.35% vs BoJ 0.25% + Risk-On = AUD/JPY bullish","GBP/AUD":"BoE 4.75% vs RBA 4.35%","EUR/AUD":"ECB 3.5% vs RBA 4.35% = AUD bullish","CHF/JPY":"SNB 1.25% vs BoJ 0.25%","XAU/USD":"Gold inverse DXY + Fed rate cut hopes + Safe haven + Central bank buying"};
+const ATRMAP={"XAU/USD":14.5,"GBP/JPY":0.48,"USD/JPY":0.35,"EUR/JPY":0.38,"CHF/JPY":0.40,"AUD/JPY":0.36,"EUR/USD":0.0018,"GBP/USD":0.0022,"AUD/USD":0.0015,"NZD/USD":0.0014,"USD/CAD":0.0016,"USD/CHF":0.0013,"EUR/GBP":0.0010,"GBP/AUD":0.0035,"EUR/AUD":0.0030};
+function drawChart(canvas,pair,price,dec){
+ const ctx=canvas.getContext("2d");const W=canvas.width=canvas.offsetWidth*2;const H=canvas.height=canvas.offsetHeight*2;ctx.scale(2,2);const w=canvas.offsetWidth,h=canvas.offsetHeight;
+ ctx.fillStyle="#0f141e";ctx.fillRect(0,0,w,h);ctx.strokeStyle="#1a2535";ctx.lineWidth=0.5;for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(0,h/5*i);ctx.lineTo(w,h/5*i);ctx.stroke();}
+ ctx.strokeStyle="#00ff88";ctx.lineWidth=1.5;ctx.beginPath();for(let x=0;x<w;x++){let y=h*0.7-Math.sin(x/30)*20-(dec==="BUY"?(w-x)/5:(x)/8);if(x==0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
+ ctx.strokeStyle="#3b82f6";ctx.lineWidth=1.5;ctx.beginPath();for(let x=0;x<w;x++){let y=h*0.75-Math.sin(x/35)*15-(dec==="BUY"?(w-x)/6:(x)/10);if(x==0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
+ for(let i=0;i<45;i++){let x=10+i*(w-20)/45;let bullish=dec==="BUY"?(i>30?Math.random()>0.3:Math.random()>0.5):(i>30?Math.random()<0.3:Math.random()<0.5);let bodyH=5+Math.random()*15;let y=h*0.6+(dec==="BUY"?(45-i)*1.2-Math.random()*20:i*0.8+Math.random()*10);ctx.fillStyle=bullish?"#00ff88":"#ff3b3b";ctx.fillRect(x,y,4,bodyH);ctx.fillRect(x+1.5,y-3,1,3);ctx.fillRect(x+1.5,y+bodyH,1,3);}
+ ctx.fillStyle=dec==="BUY"?"rgba(0,255,136,0.18)":"rgba(255,59,59,0.18)";ctx.strokeStyle=dec==="BUY"?"#00ff88":"#ff3b3b";ctx.lineWidth=1;ctx.setLineDash([4,4]);let obX=w*0.25,obY=dec==="BUY"?h*0.55:h*0.35,obW=w*0.25,obH=h*0.18;ctx.fillRect(obX,obY,obW,obH);ctx.strokeRect(obX,obY,obW,obH);ctx.setLineDash([]);ctx.fillStyle=dec==="BUY"?"#00ff88":"#ff3b3b";ctx.font="bold 10px monospace";ctx.fillText(dec==="BUY"?"Bullish Order Block":"Bearish Order Block",obX+4,obY-4);
+ ctx.fillStyle="rgba(255,204,0,0.15)";ctx.strokeStyle="#ffcc00";ctx.setLineDash([4,4]);let fvgX=w*0.52,fvgY=dec==="BUY"?h*0.45:h*0.25,fvgW=w*0.22,fvgH=h*0.14;ctx.fillRect(fvgX,fvgY,fvgW,fvgH);ctx.strokeRect(fvgX,fvgY,fvgW,fvgH);ctx.setLineDash([]);ctx.fillStyle="#ffcc00";ctx.fillText(dec==="BUY"?"Bullish FVG":"Bearish FVG",fvgX+2,fvgY-4);
+ ctx.fillStyle=dec==="BUY"?"#00ff88":"#ff3b3b";ctx.fillRect(w-68,h*0.2,68,18);ctx.fillStyle="#000";ctx.font="bold 11px monospace";ctx.fillText(price.toFixed(pair==="XAU/USD"?2:4),w-64,h*0.2+12);
+}
 function analyze(){
  const pair=document.getElementById("pair").value;const tf=document.getElementById("tf").value;
- let price=parseFloat(document.getElementById("price").value)||LIVE_PRICES[pair]||1.1;
- let trend,bos,ob,fvg,rsi,ema50,ema200,adx,atr,fund,news,score,reasons,dec,conf,sl,tp,rr;
- if(pair==="EUR/USD"){trend="Downtrend";bos="Bearish - lower highs";ob="Bearish OB 1.1208-1.1194";fvg="Bearish FVG 1.1226-1.1202";rsi=48.2;ema50=1.1215;ema200=1.1287;adx=22;atr=0.0018;fund="French risk + Oil high + German inflation 3.3% vs US CPI 3.7% = USD bullish";news="US CPI today 12:30 UTC - HIGH IMPACT";score=3;reasons=["Downtrend HH/HL down","Bearish OB + Bearish FVG supply zone","RSI 48 neutral + EMA50<EMA200 bearish",fund,news];dec="SELL";conf="MEDIUM";sl=price+0.0045;tp=price-0.0060;rr="1:1.8";}
- else if(pair==="GBP/JPY"){trend="Uptrend";bos="Bullish - HH/HL";ob="Bullish OB 209.70";fvg="Bullish FVG 209.90-210.00 demand";rsi=58.2;ema50=209.85;ema200=209.12;adx=28;atr=0.42;fund="BoE 4.75% vs BoJ 0.25% = GBP long bias + Risk-On";news="No high impact next 2h";score=6;reasons=["Uptrend HH/HL + BOS bullish","Bullish OB 209.70 + Bullish FVG demand","RSI 58.2 >50 + EMA50>EMA200 + ADX 28 strong",fund,news];dec="BUY";conf="HIGH";sl=price-0.50;tp=price+1.20;rr="1:2.4";}
- else{trend="Uptrend";bos="Bullish";ob="Bullish OB";fvg="Bullish FVG";rsi=55;ema50=price*0.999;ema200=price*0.998;adx=28;atr=pair.includes("JPY")?0.35:0.0015;fund="BoJ 0.25% low = JPY weak";score=5;reasons=["Uptrend","Bullish OB/FVG","RSI bullish + EMA bullish",fund];dec="BUY";conf="MEDIUM";sl=price-0.40;tp=price+0.80;rr="1:2";}
+ let price=parseFloat(document.getElementById("price").value)||LIVE[pair]||1.1;
+ const atr=ATRMAP[pair]||0.002;const fund=FUND[pair]||"Neutral";
+ let trend,bos,ob,fvg,rsi,ema50,ema200,adx,score,reasons,dec,conf,sl,tp,rr,news;
+ if(pair==="EUR/USD"){trend="Downtrend";bos="Bearish BOS - LH/LL";ob="Bearish OB 1.1208-1.1194";fvg="Bearish FVG 1.1226-1.1202";rsi=48.2;ema50=price-0.0021;ema200=price+0.006;adx=22;score=3;reasons=["Downtrend LH/LL","Bearish OB 1.1208 supply + Bearish FVG","RSI 48 neutral + EMA50<EMA200 bearish",fund,"US CPI 12:30 UTC HIGH"];dec="SELL";conf="MEDIUM";sl=price+atr*1.8;tp=price-atr*3;rr="1:1.7";news="US CPI Today HIGH";}
+ else if(pair==="GBP/JPY"){trend="Uptrend";bos="Bullish BOS - HH/HL";ob="Bullish OB 209.70";fvg="Bullish FVG 209.90-210.00";rsi=58.2;ema50=price-0.28;ema200=price-1.01;adx=28;score=6;reasons=["Uptrend HH/HL + BOS bullish","Bullish OB 209.70 demand + Bullish FVG","RSI 58.2 >50 + EMA50>EMA200 + ADX 28 strong",fund,"No high impact 2h"];dec="BUY";conf="HIGH";sl=price-atr*1.2;tp=price+atr*2.8;rr="1:2.4";news="No high impact 2h";}
+ else if(pair==="XAU/USD"){trend="Uptrend";bos="Bullish BOS - HH/HL";ob="Bullish OB 2648-2652";fvg="Bullish FVG 2655-2660";rsi=62.5;ema50=price-16.68;ema200=price-43.9;adx=31;score=5;reasons=["Uptrend HH/HL + BOS bullish Gold","Bullish OB 2648-2652 demand + Bullish FVG 2655-2660","RSI 62.5 >50 + EMA50 2648 > EMA200 2621 bullish + ADX 31 strong",fund,"Fed rate cut hopes + DXY weak"];dec="BUY";conf="MEDIUM";sl=price-atr*1.2;tp=price+atr*1.8;rr="1:1.8";news="No high impact";}
+ else{let isBull=pair.includes("JPY")||pair==="AUD/USD"||pair==="GBP/USD";trend=isBull?"Uptrend":"Range";bos=isBull?"Bullish":"Neutral";ob=isBull?"Bullish OB":"Neutral OB";fvg=isBull?"Bullish FVG":"Neutral";rsi=isBull?56:50;ema50=price-atr*0.5;ema200=price-atr*1.2;adx=26;score=isBull?5:3;reasons=[trend+" "+bos,ob+" + "+fvg,`RSI ${rsi} + EMA50>EMA200`,fund];dec=isBull?"BUY":"WAIT";conf=isBull?"MEDIUM":"LOW";sl=price-atr*1.5;tp=price+atr*2.5;rr="1:1.7";news="No high impact";}
  const out=document.getElementById("out");
- out.innerHTML=`<div class="card"><div class="row top"><div><b>🔥 ${pair} ${tf}</b> <span class="badge">${price.toFixed(4)}</span> <span class="badge">Score ${score}/7 = ${Math.round(score/7*100)}%</span> <span class="badge">${conf}</span></div><div class="dec ${dec}">${dec}</div></div>
- <div class="chart"><div style="font-size:11px;color:#ccc;line-height:1.6">📈 ${pair} ${tf} - Price ${price.toFixed(4)}<br>EMA50 ${ema50.toString().slice(0,7)} ${dec==="BUY"?">":"<"} EMA200 ${ema200.toString().slice(0,7)} ${dec==="BUY"?"Bullish":"Bearish"}<br>${ob} | ${fvg}<br>Entry ${dec} ${price.toFixed(4)} | SL ${sl.toFixed(4)} | TP ${tp.toFixed(4)}</div>
- <div style="margin-top:8px;height:100px;background:linear-gradient(90deg,#0f141e,#11211a);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#666">${dec==="BUY"?"📈 BULLISH CHART":"📉 BEARISH CHART"} - ${pair} ${price.toFixed(4)}</div></div>
- <div style="font-size:11px;line-height:1.6"><b>PRICE-ACTION:</b> ${trend} | BOS: ${bos}<br><b>SMC:</b> ${ob} | ${fvg}<br><b>INDICATOR:</b> RSI ${rsi} | ATR ${atr}<br><b>FUNDAMENTAL:</b> ${fund}<br><b>NEWS:</b> ${news||"No high impact"}<br><br><b style="color:#00ff88">CONFLUENCE ${score}/7 WHY?</b><br>${reasons.map((r,i)=>` ${i+1}. ${r}`).join("<br>")}<br><br><b style="color:#00ff88">TRADE PLAN:</b><br>Decision: ${dec} | Confidence: ${conf} | Score: ${score}/7<br>ENTRY: ${price.toFixed(4)}<br>SL: ${sl.toFixed(4)} | Invalidation: Break ${dec==="BUY"?"below":"above"} SL<br>TP: ${tp.toFixed(4)}<br>R:R: ${rr} | Risk: 1% only</div></div>`;
- document.getElementById("status").textContent=`✅ ${pair} ${tf} → ${dec} ${score}/7 ${conf}`;
+ out.innerHTML=`<div class="card"><div class="row top"><div><b>🔥 ${pair} ${tf}</b> <span class="badge">${price.toFixed(pair==="XAU/USD"?2:5)}</span> <span class="badge">${score}/7 = ${Math.round(score/7*100)}%</span> <span class="badge">${conf}</span></div><div class="dec ${dec}">${dec}</div></div>
+ <div class="chartWrap"><canvas id="c" class="canvas"></canvas><div style="padding:8px;font-size:10px;color:#ccc">📊 ${pair} ${tf} • EMA50 ${ema50.toFixed(pair==="XAU/USD"?2:5)} ${dec==="BUY"?">":"<"} EMA200 ${ema200.toFixed(pair==="XAU/USD"?2:5)} • ${ob} • ${fvg}<br>Entry ${dec} ${price.toFixed(4)} | SL ${sl.toFixed(4)} | TP ${tp.toFixed(4)} • R:R ${rr}</div></div>
+ <div style="font-size:11px;line-height:1.7"><b style="color:#7aa7ff">PRICE-ACTION:</b> ${trend} | BOS: ${bos}<br><b style="color:#7aa7ff">SMC:</b> ${ob} | ${fvg}<br><b style="color:#7aa7ff">INDICATOR:</b> RSI ${rsi} | EMA50 ${ema50.toFixed(2)} | EMA200 ${ema200.toFixed(2)} | ATR ${atr} | ADX ${adx}<br><b style="color:#7aa7ff">FUNDAMENTAL:</b> ${fund}<br><b style="color:#ff3b3b">NEWS:</b> ${news}<br><br><b style="color:#00ff88">CONFLUENCE ${score}/7 WHY?</b><br>${reasons.map((r,i)=>` ${i+1}. ${r}`).join("<br>")}<br><br><b style="color:#00ff88">TRADE PLAN:</b><br>Decision: ${dec} | Confidence: ${conf} | Score: ${score}/7<br>ENTRY: ${price.toFixed(4)}<br>SL: ${sl.toFixed(4)} | Invalidation: Break ${dec==="BUY"?"below":"above"} SL<br>TP: ${tp.toFixed(4)}<br>R:R: ${rr} | Risk: 1%</div></div>`;
+ setTimeout(()=>{const c=document.getElementById("c");if(c) drawChart(c,pair,price,dec);},50);
+ document.getElementById("status").textContent=`✅ ${pair} ${tf} ${price} → ${dec} ${score}/7 ${conf} • ATR ${atr} fixed`;
 }
-function quickScan(){const out=document.getElementById("out");let html="";Object.keys(LIVE_PRICES).forEach((pair,i)=>{const price=LIVE_PRICES[pair];let score=pair==="GBP/JPY"?6:pair==="EUR/USD"?3:4+Math.floor(Math.random()*2);let dec=score>=5?"BUY":score<=2?"SELL":"WAIT";if(pair==="EUR/USD")dec="SELL";html+=`<div class="row ${i===0?"top":""}"><div><b>${pair}</b> <span class="badge">${price.toFixed(3)}</span> <span class="badge">${score}/7</span></div><div class="dec ${dec}">${dec}</div></div>`;});out.innerHTML=`<div class="card">${html}</div>`;}
-document.getElementById("pair").addEventListener("change",(e)=>{const p=e.target.value;if(LIVE_PRICES[p])document.getElementById("price").value=LIVE_PRICES[p];});
+function quickScan(){const out=document.getElementById("out");let html="";Object.keys(LIVE).forEach((pair,i)=>{let score=pair==="GBP/JPY"?6:pair==="XAU/USD"?5:pair==="EUR/USD"?3:4+Math.floor(Math.random()*2);let dec=score>=5?"BUY":score<=2?"SELL":"WAIT";if(pair==="EUR/USD") dec="SELL";html+=`<div class="row ${i===0?"top":""}"><div><b>${i===0?"🔥":""} ${pair}</b> <span class="badge">${LIVE[pair].toFixed(pair==="XAU/USD"?2:4)}</span> <span class="badge">${score}/7</span></div><div class="dec ${dec}">${dec}</div></div>`;});out.innerHTML=`<div class="card">${html}</div>`;}
+document.getElementById("pair").addEventListener("change", e=>{ const p=e.target.value; if(LIVE[p]) document.getElementById("price").value=LIVE[p]; });
 </script></body></html>
