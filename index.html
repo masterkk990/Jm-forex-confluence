@@ -1,20 +1,435 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JM FOREX CONFLUENCE AI - OVERALL FINAL</title>
+<title>JM FOREX CONFLUENCE AI</title>
 <script src="https://s3.tradingview.com/tv.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0a0e13;color:#e6e6e6;font-family:monospace;padding:10px;font-size:11px}
-h1{color:#00ff88;text-align:center;font-size:17px}
-.sub{color:#888;text-align:center;font-size:9px;margin-bottom:8px}
-.card{background:#141a23;border:1px solid #1f2a38;border-radius:14px;padding:10px;margin:8px 0}
-select,button{width:100%;padding:11px;border-radius:10px;border:1px solid #2a3a50;margin:5px 0;font-family:monospace}
-select{background:#0a0e13;color:#fff}
-button{background:#00ff88;color:#000;font-weight:bold;border:none;cursor:pointer}
-.btn2{background:#1f2a38;color:#fff}
-.row{display:flex;justify-content:space-between;background:#0f141e;padding:9px;border-radius:10px;margin:6px 0;border-left:4px solid #333;align-items:center;gap:8px}
-.top{border-left-color:#00ff88;background:#11211a}
-.dec{padding:6px 12px;border-radius:20px;font-weight:bold;min-width:78px
+body{background:#0a0e13;color:#e6e6e6;font-family:monospace;padding:10px;font-size:12px}
+h1{color:#00ff88;text-align:center;font-size:19px}
+.sub{text-align:center;color:#999;font-size:9px;margin:7px}
+.card{background:#141a23;border:1px solid #263346;border-radius:12px;padding:11px;margin:9px 0}
+label{display:block;color:#7aa7ff;margin:8px 0 4px}
+input,select,button{width:100%;padding:12px;margin:4px 0;border-radius:8px;border:1px solid #304157;font:inherit}
+input,select{background:#0a0e13;color:white}
+button{background:#00ff88;color:#000;font-weight:bold;border:0}
+button.secondary{background:#263346;color:white}
+button:disabled{opacity:.5}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;background:#0e141d;border-radius:8px;margin:6px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.metric{background:#0e141d;padding:9px;border-radius:8px;overflow-wrap:anywhere}
+.metric b{display:block;color:#7aa7ff;font-size:9px;margin-bottom:5px}
+.signal{text-align:center;font-size:21px;font-weight:bold;padding:15px;border-radius:10px;margin:8px 0}
+.BUY{color:#00ff88}.SELL{color:#ff5555}.WAIT{color:#ffcc00}
+.chart{height:430px;background:#000;border-radius:10px;overflow:hidden}
+.good{border:1px solid #00aa66;padding:10px;border-radius:8px;margin:8px 0;overflow-wrap:anywhere}
+.warn{border:1px solid #d6a600;padding:10px;border-radius:8px;margin:8px 0;overflow-wrap:anywhere}
+.small{color:#999;font-size:9px;line-height:1.6}
+a{color:#7aa7ff}
+</style>
+</head>
+<body>
+
+<h1>🐉 JM FOREX CONFLUENCE AI</h1>
+<div class="sub">MARKET DATA • TECHNICAL ANALYSIS • NO RANDOM SIGNALS</div>
+
+<div class="card">
+<label>Twelve Data API key</label>
+<input id="apiKey" type="password" placeholder="Paste your API key here" autocomplete="off">
+<div class="small">Get a key from twelvedata.com. Your key is not saved by this app. Browser-based API requests may expose it to the service and browser tools.</div>
+
+<label>Market</label>
+<select id="pair">
+<option value="XAU/USD">XAU/USD — Gold</option>
+<option value="EUR/USD">EUR/USD</option>
+<option value="GBP/USD">GBP/USD</option>
+<option value="USD/JPY">USD/JPY</option>
+<option value="USD/CHF">USD/CHF</option>
+<option value="AUD/USD">AUD/USD</option>
+<option value="USD/CAD">USD/CAD</option>
+<option value="NZD/USD">NZD/USD</option>
+<option value="EUR/JPY">EUR/JPY</option>
+<option value="GBP/JPY">GBP/JPY</option>
+</select>
+
+<label>Execution timeframe</label>
+<select id="tf">
+<option value="15min">15 minutes</option>
+<option value="1h" selected>1 hour</option>
+<option value="4h">4 hours</option>
+<option value="5min">5 minutes</option>
+<option value="1min">1 minute</option>
+</select>
+
+<button onclick="analyze()">🧠 RUN CONFLUENCE ANALYSIS</button>
+<button class="secondary" onclick="scanAll()">🔍 SCAN ALL 10 MARKETS</button>
+<div id="status" class="small">Ready. Enter your API key to begin.</div>
+</div>
+
+<div class="card">
+<b style="color:#7aa7ff">📈 TRADINGVIEW MARKET CHART</b>
+<div id="tv_chart" class="chart"></div>
+</div>
+
+<div id="out"></div>
+
+<script>
+"use strict";
+
+const $=id=>document.getElementById(id);
+const PAIRS=[
+"XAU/USD","EUR/USD","GBP/USD","USD/JPY","USD/CHF",
+"AUD/USD","USD/CAD","NZD/USD","EUR/JPY","GBP/JPY"
+];
+
+const TV={
+"XAU/USD":"OANDA:XAUUSD",
+"EUR/USD":"OANDA:EURUSD",
+"GBP/USD":"OANDA:GBPUSD",
+"USD/JPY":"OANDA:USDJPY",
+"USD/CHF":"OANDA:USDCHF",
+"AUD/USD":"OANDA:AUDUSD",
+"USD/CAD":"OANDA:USDCAD",
+"NZD/USD":"OANDA:NZDUSD",
+"EUR/JPY":"OANDA:EURJPY",
+"GBP/JPY":"OANDA:GBPJPY"
+};
+
+const escapeHTML=s=>String(s??"").replace(
+/[&<>"']/g,
+c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])
+);
+
+function fmt(n,pair){
+if(!Number.isFinite(n))return "N/A";
+return n.toFixed(pair.includes("JPY")?3:pair==="XAU/USD"?2:5);
+}
+
+function loadChart(){
+if(!window.TradingView)return;
+const pair=$("pair").value;
+const tf=$("tf").value;
+const intervals={"1min":"1","5min":"5","15min":"15","1h":"60","4h":"240"};
+$("tv_chart").innerHTML="";
+new TradingView.widget({
+autosize:true,
+symbol:TV[pair],
+interval:intervals[tf]||"60",
+timezone:"Africa/Nairobi",
+theme:"dark",
+style:"1",
+locale:"en",
+allow_symbol_change:true,
+enable_publishing:false,
+container_id:"tv_chart"
+});
+}
+
+function ema(values,period){
+if(values.length<period)return null;
+const k=2/(period+1);
+let v=values[0];
+for(let i=1;i<values.length;i++){
+v=values[i]*k+v*(1-k);
+}
+return v;
+}
+
+function rsi(values,period=14){
+if(values.length<=period)return null;
+let gains=0,losses=0;
+for(let i=values.length-period;i<values.length;i++){
+const d=values[i]-values[i-1];
+if(d>0)gains+=d;
+else losses-=d;
+}
+if(losses===0)return gains===0?50:100;
+return 100-(100/(1+gains/losses));
+}
+
+function macd(values){
+if(values.length<35)return null;
+const fast=ema(values.slice(-26),12);
+const slow=ema(values.slice(-26),26);
+const line=fast-slow;
+const signal=ema(values.slice(-9).map((_,i)=>{
+return ema(values.slice(0,values.length-8+i+1),12)-
+ema(values.slice(0,values.length-8+i+1),26);
+}).filter(Number.isFinite),9);
+return {line,signal};
+}
+
+function atr(candles,period=14){
+if(candles.length<period+1)return null;
+const trs=[];
+for(let i=1;i<candles.length;i++){
+const c=candles[i],p=candles[i-1];
+trs.push(Math.max(
+c.high-c.low,
+Math.abs(c.high-p.close),
+Math.abs(c.low-p.close)
+));
+}
+return trs.slice(-period).reduce((a,b)=>a+b,0)/period;
+}
+
+async function getCandles(pair,interval,key){
+const url=new URL("https://api.twelvedata.com/time_series");
+url.searchParams.set("symbol",pair);
+url.searchParams.set("interval",interval);
+url.searchParams.set("outputsize","150");
+url.searchParams.set("apikey",key);
+
+const response=await fetch(url.toString(),{cache:"no-store"});
+if(!response.ok)throw Error("Market data request failed (HTTP "+response.status+")");
+const data=await response.json();
+
+if(data.status==="error"||!Array.isArray(data.values)){
+throw Error(data.message||"No candle data returned. Check API key, symbol, plan and request limits.");
+}
+
+const candles=data.values.map(x=>({
+time:x.datetime,
+open:Number(x.open),
+high:Number(x.high),
+low:Number(x.low),
+close:Number(x.close)
+})).filter(c=>Object.values(c).slice(1).every(Number.isFinite)).reverse();
+
+if(candles.length<50){
+throw Error("Not enough candles for reliable indicator calculations.");
+}
+return candles;
+}
+
+function inspect(candles){
+const closes=candles.map(c=>c.close);
+const e20=ema(closes.slice(-100),20);
+const e50=ema(closes.slice(-100),50);
+const e200=ema(closes.slice(-150),200);
+const rv=rsi(closes);
+const mc=macd(closes);
+const av=atr(candles);
+const last=candles[candles.length-1];
+const prev=candles[candles.length-2];
+
+let points=0;
+if(e20!==null&&e50!==null){
+if(e20>e50)points++;
+if(e20<e50)points--;
+}
+if(e50!==null&&e200!==null){
+if(e50>e200)points++;
+if(e50<e200)points--;
+}
+if(rv!==null){
+if(rv>50&&rv<70)points++;
+if(rv<50&&rv>30)points--;
+}
+if(mc){
+if(mc.line>mc.signal)points++;
+if(mc.line<mc.signal)points--;
+}
+if(last.close>prev.high)points++;
+else if(last.close<prev.low)points--;
+
+const direction=points>=2?"BUY":points<=-2?"SELL":"WAIT";
+return {
+last,prev,e20,e50,e200,rv,mc,av,points,direction,
+score:Math.round(Math.abs(points)/5*100)
+};
+}
+
+function timeframeBias(candles){
+return inspect(candles).direction;
+}
+
+function tradePlan(a,pair){
+const price=a.last.close;
+const volatility=a.av;
+if(!Number.isFinite(volatility)||volatility<=0)return null;
+
+const distance=volatility*1.5;
+const target=distance*2;
+const digits=pair.includes("JPY")?3:pair==="XAU/USD"?2:5;
+
+if(a.direction==="BUY"){
+return {
+entry:price,sl:price-distance,tp1:price+target,
+tp2:price+target*1.5,digits
+};
+}
+if(a.direction==="SELL"){
+return {
+entry:price,sl:price+distance,tp1:price-target,
+tp2:price-target*1.5,digits
+};
+}
+return null;
+}
+
+function metric(name,value){
+return '<div class="metric"><b>'+escapeHTML(name)+'</b>'+
+escapeHTML(value)+'</div>';
+}
+
+function render(pair,a,h4,h1,m15,sourceTime){
+const plan=tradePlan(a,pair);
+const confirmed=[h4,h1,m15].filter(x=>x===a.direction).length;
+const allAligned=h4===h1&&h1===m15&&a.direction===h1&&a.direction!=="WAIT";
+const score=Math.round((Math.abs(a.points)/5*60)+(confirmed/3*40));
+const validScore=Math.min(100,score);
+
+let html='<div class="card">';
+html+='<div class="signal '+a.direction+'">'+a.direction+
+' — '+escapeHTML(pair)+'</div>';
+
+html+='<div class="warn">ANALYSIS SCORE: '+validScore+
+'/100. This is a rule-based score, NOT a probability of winning.</div>';
+
+html+='<div class="good">Market price: <b>'+
+fmt(a.last.close,pair)+'</b><br>Last candle: '+
+escapeHTML(sourceTime)+'<br>Data source: Twelve Data candle history<br>'+
+'Confirmed timeframe alignment: '+confirmed+'/3</div>';
+
+html+='<div class="grid">';
+html+=metric("RSI (14)",a.rv===null?"N/A":a.rv.toFixed(2));
+html+=metric("EMA 20",fmt(a.e20,pair));
+html+=metric("EMA 50",fmt(a.e50,pair));
+html+=metric("EMA 200",fmt(a.e200,pair));
+html+=metric("MACD",a.mc?a.mc.line.toFixed(6):"N/A");
+html+=metric("MACD SIGNAL",a.mc?a.mc.signal.toFixed(6):"N/A");
+html+=metric("ATR (14)",a.av===null?"N/A":fmt(a.av,pair));
+html+=metric("Directional points",a.points);
+html+='</div>';
+
+html+='<h3 style="margin-top:12px;color:#7aa7ff">MULTI-TIMEFRAME CHECK</h3>';
+for(const [tf,bias] of [["4H",h4],["1H",h1],["15M",m15]]){
+html+='<div class="row"><b>'+tf+'</b><b class="'+bias+'">'+bias+'</b></div>';
+}
+
+if(allAligned&&plan){
+html+='<div class="good"><b>TRADE PLAN — RESEARCH ONLY</b><br>'+
+'Reference price: '+fmt(plan.entry,pair)+'<br>'+
+'Potential entry: '+fmt(plan.entry,pair)+'<br>'+
+'Stop loss: '+fmt(plan.sl,pair)+'<br>'+
+'Take profit 1: '+fmt(plan.tp1,pair)+'<br>'+
+'Take profit 2: '+fmt(plan.tp2,pair)+'<br>'+
+'Risk/reward to TP1: 1:2<br>'+
+'ATR-based levels; not broker-verified execution prices.</div>';
+}else{
+html+='<div class="warn"><b>WAIT — NO CONFIRMED SETUP</b><br>'+
+'The selected timeframe and 4H/1H/15M checks do not fully agree. '+
+'Do not treat this result as a trade instruction.</div>';
+}
+
+html+='<div class="small">This tool does not place orders, read your MT5 account, '+
+'guarantee accuracy, or calculate a proven win probability. '+
+'Check spread, session, news and broker pricing before any trade.</div>';
+html+='</div>';
+$("out").innerHTML=html;
+}
+
+let busy=false;
+
+async function analyze(){
+if(busy)return;
+const key=$("apiKey").value.trim();
+if(!key){
+$("status").textContent="Enter your Twelve Data API key first.";
+return;
+}
+
+busy=true;
+$("status").textContent="Fetching real candle history and calculating indicators...";
+$("out").innerHTML="";
+loadChart();
+
+try{
+const pair=$("pair").value;
+const selected=$("tf").value;
+const results=await Promise.all([
+getCandles(pair,"4h",key),
+getCandles(pair,"1h",key),
+getCandles(pair,"15min",key),
+selected==="4h"||selected==="1h"||selected==="15min"
+?Promise.resolve(null):getCandles(pair,selected,key)
+]);
+
+const h4=timeframeBias(results[0]);
+const h1=timeframeBias(results[1]);
+const m15=timeframeBias(results[2]);
+const chosen=selected==="4h"?results[0]:
+selected==="1h"?results[1]:
+selected==="15min"?results[2]:results[3];
+
+const a=inspect(chosen);
+render(pair,a,h4,h1,m15,a.last.time);
+$("status").textContent="Analysis complete. Last candle: "+a.last.time;
+}catch(e){
+$("out").innerHTML='<div class="card warn"><b>ANALYSIS UNAVAILABLE</b><br>'+
+escapeHTML(e.message)+'<br>Check your internet connection, API key and available API credits. No fallback or random signal was generated.</div>';
+$("status").textContent="Data or analysis error.";
+}finally{
+busy=false;
+}
+}
+
+async function scanAll(){
+if(busy)return;
+const key=$("apiKey").value.trim();
+if(!key){
+$("status").textContent="Enter your Twelve Data API key first.";
+return;
+}
+
+busy=true;
+$("status").textContent="Scanning markets. Requests may use your API credits.";
+$("out").innerHTML="";
+let html='<div class="card"><h3>MARKET SCANNER</h3>'+
+'<div class="small">Each market uses fresh 1H candles. '+
+'Check available API credits before scanning.</div>';
+
+try{
+for(const pair of PAIRS){
+html+='<div class="row"><span>'+escapeHTML(pair)+
+'</span><span>Loading...</span></div>';
+$("out").innerHTML=html+'</div>';
+
+try{
+const candles=await getCandles(pair,"1h",key);
+const a=inspect(candles);
+const direction=a.direction;
+html=html.replace(
+'<div class="row"><span>'+escapeHTML(pair)+'</span><span>Loading...</span></div>',
+'<div class="row"><span><b>'+escapeHTML(pair)+'</b><br><span class="small">'+
+'Price '+fmt(a.last.close,pair)+' • Score '+a.score+'/100</span></span>'+
+'<b class="'+direction+'">'+direction+'</b></div>'
+);
+}catch(e){
+html=html.replace(
+'<div class="row"><span>'+escapeHTML(pair)+'</span><span>Loading...</span></div>',
+'<div class="row"><span>'+escapeHTML(pair)+'</span><span class="WAIT">UNAVAILABLE</span></div>'
+);
+}
+$("out").innerHTML=html+'</div>';
+}
+}catch(e){
+html+='<div class="warn">'+escapeHTML(e.message)+'</div>';
+}
+finally{
+$("out").innerHTML=html+'</div>';
+$("status").textContent="Scan finished. Unavailable markets are not assigned signals.";
+busy=false;
+}
+}
+
+$("pair").addEventListener("change",loadChart);
+$("tf").addEventListener("change",loadChart);
+loadChart();
+</script>
+</body>
+</html>
