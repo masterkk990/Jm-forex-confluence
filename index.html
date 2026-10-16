@@ -2,19 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JM FOREX CONFLUENCE AI - REAL</title>
+<title>JM FOREX CONFLUENCE AI</title>
 <style>
-:root{color-scheme:dark;--bg:#080d14;--card:#131d2b;--line:#2a3c52;--green:#00f09a;--yellow:#ffd166;--muted:#9aabc0}
+:root{--bg:#080d14;--card:#161f2e;--line:#2a3b52;--green:#00e99a;--yellow:#ffd166;--muted:#9aabc0}
 *{box-sizing:border-box}body{margin:auto;max-width:900px;padding:12px;background:var(--bg);color:#edf4fc;font:13px system-ui}
-h1{text-align:center;color:var(--green);margin:8px 0} .sub{text-align:center;color:var(--muted);font-size:11px;margin-bottom:14px}
+h1{text-align:center;color:var(--green);line-height:1.2} .sub{text-align:center;color:var(--muted);font-size:11px;margin:6px 0 14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
-label{display:block;color:#a9c7ef;margin:8px 0 5px} select,button{width:100%;padding:12px;border-radius:8px;border:1px solid var(--line);background:#0a121c;color:#fff}
-button{background:var(--green);color:#03150e;font-weight:800;border:0;cursor:pointer} button.sec{background:#22344a;color:#fff}
-.row{display:flex;gap:8px}.row>*{flex:1}
-.status{text-align:center;padding:9px;background:#0a121c;border-radius:8px;color:var(--yellow);margin-top:8px}
+label{display:block;color:#a9c7ef;margin:8px 0 6px} select,button{width:100%;padding:13px;border-radius:10px;border:1px solid var(--line);background:#0a121c;color:#fff;font:inherit}
+button{background:var(--green);color:#03150e;font-weight:900;border:0;margin-top:10px} button.sec{background:#22344a;color:#fff}
+.status{text-align:center;padding:10px;background:#09111b;border-radius:8px;color:var(--yellow);margin-top:10px}
 .note{color:var(--muted);font-size:11px;line-height:1.5}
-.signal{padding:11px;border:1px solid var(--line);border-radius:9px;background:#0c1826;margin:8px 0}
-.green{color:var(--green)}.red{color:#ff6376}
+.signal{padding:12px;border:1px solid var(--line);border-radius:10px;background:#0c1826;margin:8px 0}
+.green{color:var(--green)} .red{color:#ff6376} .big{font-size:26px;text-align:center;font-weight:800}
 </style>
 </head>
 <body>
@@ -24,7 +23,7 @@ button{background:var(--green);color:#03150e;font-weight:800;border:0;cursor:poi
 <div class="card">
 <label>Market - REAL Deriv Feed (tracks real interbank)</label>
 <select id="market">
-<option value="frxXAUUSD">XAU/USD - Gold REAL</option>
+<option value="frxXAUUSD" selected>XAU/USD - Gold REAL</option>
 <option value="frxEURUSD">EUR/USD REAL</option>
 <option value="frxGBPUSD">GBP/USD REAL</option>
 <option value="frxUSDJPY">USD/JPY REAL</option>
@@ -36,4 +35,87 @@ button{background:var(--green);color:#03150e;font-weight:800;border:0;cursor:poi
 <option value="frxEURGBP">EUR/GBP REAL</option>
 </select>
 <label>Execution timeframe</label>
-<select id="tf"><option value="60">1 minute</option><option value="300">
+<select id="tf">
+<option value="60">1 minute</option>
+<option value="300">5 minutes</option>
+<option value="900" selected>15 minutes</option>
+<option value="1800">30 minutes</option>
+<option value="3600">1 hour</option>
+</select>
+<button id="run">🧠 RUN CONFLUENCE ANALYSIS</button>
+<button id="scan" class="sec">🔍 SCAN ALL 10 MARKETS</button>
+<div id="status" class="status">Ready - Real Deriv feed</div>
+<div id="diag" class="note"></div>
+</div>
+
+<div class="card"><h2>Live Price</h2><div id="price" class="big">—</div><div id="time" class="note" style="text-align:center">Press RUN</div></div>
+<div class="card"><h2>Confluence Result</h2><div id="result" class="note">Waiting for analysis...</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+function ema(arr,p){let k=2/(p+1),e=arr[0];for(let i=1;i<arr.length;i++)e=arr[i]*k+e*(1-k);return e;}
+function rsiCalc(c,p=14){let g=0,l=0;for(let i=c.length-p;i<c.length;i++){let d=c[i]-c[i-1];if(d>0)g+=d;else l-=d;}if(l==0)return 100;return 100-100/(1+g/l);}
+
+function fetchReal(symbol, gran, count=200){
+ return new Promise((res,rej)=>{
+  const urls=["wss://ws.derivws.com/websockets/v3?app_id=1089","wss://ws.binaryws.com/websockets/v3?app_id=1089"];
+  let idx=0;
+  function tryUrl(){
+   const ws=new WebSocket(urls[idx]);
+   const to=setTimeout(()=>{ws.close(); if(idx<1){idx++;tryUrl();}else rej("timeout");},6000);
+   ws.onopen=()=>ws.send(JSON.stringify({ticks_history:symbol,style:"candles",granularity:gran,count}));
+   ws.onmessage=e=>{
+    const m=JSON.parse(e.data);
+    if(m.candles){clearTimeout(to);ws.close();res(m.candles);}
+    if(m.error){clearTimeout(to);ws.close();rej(m.error.message);}
+   };
+   ws.onclose=()=>{ if(idx<1 && !to._destroyed){idx++;tryUrl();} };
+   ws.onerror=()=>{clearTimeout(to); if(idx<1){idx++;tryUrl();}else rej("ws error");}
+  }
+  tryUrl();
+ });
+}
+
+async function analyze(symbol, gran){
+ const candles=await fetchReal(symbol, gran);
+ const closes=candles.map(x=>x.close);
+ const last=candles[candles.length-1];
+ const e21=ema(closes.slice(-60),21), e50=ema(closes.slice(-90),50);
+ const r=rsiCalc(closes,14);
+ let score=0, txt=[];
+ if(last.close>e21){score++;txt.push("Above EMA21");}else txt.push("Below EMA21");
+ if(e21>e50){score++;txt.push("Uptrend");}else txt.push("Downtrend");
+ if(r>50) score++;
+ let sig=score>=3?"BUY CONFLUENCE":score<=1?"SELL CONFLUENCE":"WAIT";
+ let cls=sig.includes("BUY")?"green":sig.includes("SELL")?"red":"yellow";
+ return {last, sig, cls, txt, r, e21, e50, score};
+}
+
+$("run").onclick=async()=>{
+ const sym=$("market").value, tf=Number($("tf").value);
+ $("status").textContent="Fetching REAL "+sym+"...";
+ try{
+  const r=await analyze(sym, tf);
+  $("price").textContent=r.last.close;
+  $("time").textContent=new Date(r.last.epoch*1000).toLocaleTimeString();
+  $("result").innerHTML=`<div class="signal"><b class="${r.cls}">${r.sig}</b> (${r.score}/3) — ${sym.replace("frx","")} | ${r.last.close}<br>EMA21 ${r.e21.toFixed(2)} EMA50 ${r.e50.toFixed(2)} RSI ${r.r.toFixed(1)}<br><span class="note">${r.txt.join(" · ")}</span></div>`;
+  $("status").textContent="LIVE REAL "+sym; $("diag").textContent="Real market data, no API key needed";
+ }catch(e){ $("status").textContent="Error: "+e; }
+};
+
+$("scan").onclick=async()=>{
+ const tf=Number($("tf").value);
+ const list=["frxXAUUSD","frxEURUSD","frxGBPUSD","frxUSDJPY","frxAUDUSD","frxUSDCAD","frxUSDCHF","frxEURJPY","frxGBPJPY","frxEURGBP"];
+ $("result").innerHTML=""; $("status").textContent="Scanning 10 REAL markets...";
+ for(const s of list){
+  try{
+   const r=await analyze(s, tf);
+   $("result").innerHTML+=`<div class="signal"><b>${s.replace("frx","")}</b> <b class="${r.cls}">${r.sig}</b> (${r.score}/3) ${r.last.close} RSI ${r.r.toFixed(1)}</div>`;
+  }catch(e){ $("result").innerHTML+=`<div class="signal">${s} error ${e}</div>`; }
+  await new Promise(x=>setTimeout(x,300));
+ }
+ $("status").textContent="Scan complete - REAL data";
+};
+</script>
+</body>
+</html>
