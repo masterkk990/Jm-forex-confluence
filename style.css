@@ -1,1 +1,107 @@
+* {
+  box-sizing: border-box;
+}
 
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #080d14;
+  color: #ffffff;
+}
+
+.app {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  padding: 25px 10px;
+}
+
+header h1 {
+  margin: 0;
+  color: #00e99a;
+  font-size: 28px;
+}
+
+header p {
+  color: #9aa7b5;
+}
+
+.card {
+  background: #121b27;
+  border: 1px solid #2a3b50;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 15px;
+  color: #b9c5d1;
+}
+
+select {
+  width: 100%;
+  margin-top: 8px;
+  padding: 13px;
+  border-radius: 8px;
+  border: 1px solid #2a3b50;
+  background: #080d14;
+  color: white;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #00e99a;
+  color: #06110c;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.result {
+  margin-top: 20px;
+  padding: 18px;
+  background: #080d14;
+  border: 1px solid #2a3b50;
+  border-radius: 10px;
+}
+
+.signal {
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 8px;
+  background: #172535;
+  color: #00e99a;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #2a3b50;
+  margin: 20px 0;
+}
+
+small {
+  display: block;
+  margin-top: 20px;
+  color: #8896a5;
+  line-height: 1.5;
+}
