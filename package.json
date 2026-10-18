@@ -1,7 +1,15 @@
 {
+  "name": "jm-forex-confluence",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite",
     "preview": "vite preview"
-  }
+  },
+  "dependencies": {
+    "vite": "^7.0.0"
+  },
+  "devDependencies": {}
 }
